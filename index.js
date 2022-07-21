@@ -150,8 +150,8 @@ class SvgUri extends Component{
   // Remove empty strings from children array
   trimElementChilden(children) {
     for (child of children) {
-      if (typeof child === 'string') { 
-        if (child.trim().length === 0) 
+      if (typeof child === 'string') {
+        if (child.trim().length === 0)
           children.splice(children.indexOf(child), 1);
       }
     }
@@ -236,14 +236,19 @@ class SvgUri extends Component{
       }));
     });
 
-     const componentAtts =  Array.from(attributes)
+    let componentAtts =  Array.from(attributes)
       .map(utils.camelCaseNodeName)
       .map(utils.removePixelsFromNodeValue)
-      .filter(utils.getEnabledAttributes(enabledAttributes.concat(COMMON_ATTS)))
-      .reduce((acc, {nodeName, nodeValue}) => {
-        acc[nodeName] = (this.state.fill && nodeName === 'fill' && nodeValue !== 'none') ? this.state.fill : nodeValue
-        return acc
-      }, {});
+      .filter(utils.getEnabledAttributes(enabledAttributes.concat(COMMON_ATTS)));
+
+    if (!componentAtts.some(_ => _.nodeName == 'fill')) {
+      componentAtts.push({nodeName: 'fill', nodeValue: '#000000'}); // default color if not set
+    }
+
+    componentAtts = componentAtts.reduce((acc, {nodeName, nodeValue}) => {
+      acc[nodeName] = (this.state.fill && nodeName === 'fill' && nodeValue !== 'none') ? this.state.fill : nodeValue
+      return acc
+    }, {});
     Object.assign(componentAtts, styleAtts);
 
     return componentAtts;
